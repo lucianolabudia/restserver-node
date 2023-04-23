@@ -5,14 +5,14 @@ const User = require('../models/user');
 
 
 
-const usersGet = (req, res = response) => { 
+const usersGet = async(req, res = response) => { 
 
-    const query = req.query;
+    const { limit = 5, from = 0 } = req.query;
+    const users = await User.find()
+        .skip( Number( from ) )
+        .limit( Number( limit ) );
 
-    res.json({
-        msg: 'get API - Controller',
-        query
-    })
+    res.json( users );
 }
 
 const usersPost = async(req, res = response) => { 
@@ -27,9 +27,7 @@ const usersPost = async(req, res = response) => {
     // Guardar en BD
     await user.save();
 
-    res.json({
-        user
-    });
+    res.json( user );
 }
 
 const usersPut = async(req, res = response) => { 
@@ -46,10 +44,7 @@ const usersPut = async(req, res = response) => {
 
     const user = await User.findByIdAndUpdate( id, rest );
 
-    res.json({
-        msg: 'put API - Controller',
-        user
-    })
+    res.json( user );
 }
 
 const usersPatch = (req, res = response) => { 
