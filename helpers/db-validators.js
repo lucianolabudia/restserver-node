@@ -1,4 +1,6 @@
 const Role = require('../models/role');
+const User = require('../models/user');
+
 
 const isValidRole = async(role = '') => {
     const existsRole = await Role.findOne({ role });
@@ -7,6 +9,19 @@ const isValidRole = async(role = '') => {
     }
 }
 
+const existsEmail = async( email = '' ) => {
+
+    // Verifica si el email existe
+    const existsEmail = await User.findOne({ email });
+    if (existsEmail) {
+        throw new Error(`El email: ${ email }, ya esta registrado`);
+        
+    }
+}
+
+
+
 module.exports = {
-    isValidRole
+    isValidRole,
+    existsEmail
 }
