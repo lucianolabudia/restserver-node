@@ -6,7 +6,7 @@ const { User, Category, Product } = require('../models');
 
 const permittedCollections = [
     'users',
-    'category',
+    'categories',
     'products',
     'roles'
 ];
@@ -34,6 +34,48 @@ const searchUsers = async( term = '', res = response ) => {
     });
 }
 
+const searchCategories = async( term = '', res = response ) => {
+
+    const isMongoID = ObjectId.isValid( term ); //TRUE
+
+    if ( isMongoID ) {
+        const category = await Category.findById( term );
+        return res.json({
+            results: ( category ) ? [ category ] : []
+        });
+    }
+
+    const regex = new RegExp( term, 'i' );
+
+    const categories = await Category.find({ name: regex, status: true });
+
+    res.json({
+        results: categories
+    });
+}
+
+
+const searchProducts = async( term = '', res = response ) => {
+
+    const isMongoID = ObjectId.isValid( term ); //TRUE
+
+    if ( isMongoID ) {
+        const product = await Product.findById( term ).populate('category', 'name');
+        return res.json({
+            results: ( product ) ? [ product ] : []
+        });
+    }
+
+    const regex = new RegExp( term, 'i' );
+
+    const products = await Product.find({ name: regex, status: true })
+        .populate('category', 'name');
+
+    res.json({
+        results: products
+    });
+}
+
 
 const search = ( req, res = response ) => {
 
@@ -50,12 +92,12 @@ const search = ( req, res = response ) => {
             searchUsers( term, res );
             break;
     
-        case 'category':
-            
+        case 'categories':
+            searchCategories( term, res );
             break;
     
         case 'products':
-            
+            searchProducts( term, res );
             break;
     
         default:
